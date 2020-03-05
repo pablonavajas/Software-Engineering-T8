@@ -11,7 +11,9 @@ public class WeatherClientTest {
   @Test
   public void weatherClientReturnsSummaryStringAndTempInt() {
 
-    WeatherClient weatherClient = new WeatherClient("LONDON", "FRIDAY");
+    WeatherClient weatherClient = new WeatherClient();
+
+    weatherClient.check("LONDON", "FRIDAY");
 
     assertThat(weatherClient.summary().isEmpty(), is(false));
     assertThat(weatherClient.temperature(), is(instanceOf(Integer.class)));
@@ -20,8 +22,19 @@ public class WeatherClientTest {
   @Test
   public void weatherClientCachesData() {
 
-    WeatherClient weatherClient = new WeatherClient("BIRMINGHAM", "MONDAY");
+    WeatherClient weatherClient = new WeatherClient();
+
+    weatherClient.check("BIRMINGHAM", "TUESDAY");
+
+    assertThat(weatherClient.dataCached(), is(false));
+    assertThat(weatherClient.summary().isEmpty(), is(false));
+    assertThat(weatherClient.temperature(), is(instanceOf(Integer.class)));
 
 
+    weatherClient.check("BIRMINGHAM", "TUESDAY");
+
+    assertThat(weatherClient.dataCached(), is(true));
+    assertThat(weatherClient.summary().isEmpty(), is(false));
+    assertThat(weatherClient.temperature(), is(instanceOf(Integer.class)));
   }
 }
