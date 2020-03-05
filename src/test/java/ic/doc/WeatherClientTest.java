@@ -37,4 +37,25 @@ public class WeatherClientTest {
     assertThat(weatherClient.summary().isEmpty(), is(false));
     assertThat(weatherClient.temperature(), is(instanceOf(Integer.class)));
   }
+
+  @Test
+  public void weatherClientCachesDataUpToMaxSize() {
+
+    WeatherClient weatherClient = new WeatherClient(1);
+
+    weatherClient.check("BIRMINGHAM", "TUESDAY");
+    assertThat(weatherClient.dataCached(), is(false));
+
+    //weatherClient.check("LONDON", "TUESDAY");
+    //assertThat(weatherClient.dataCached(), is(false));
+
+    weatherClient.check("BIRMINGHAM", "TUESDAY");
+    assertThat(weatherClient.dataCached(), is(true));
+
+    weatherClient.check("EDINBURGH", "TUESDAY");
+    assertThat(weatherClient.dataCached(), is(false));
+
+    weatherClient.check("BIRMINGHAM", "TUESDAY");
+    assertThat(weatherClient.dataCached(), is(false));
+  }
 }

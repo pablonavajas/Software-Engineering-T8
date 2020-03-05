@@ -2,7 +2,8 @@ package ic.doc;
 
 import com.weather.*;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class WeatherClient {
 
@@ -12,15 +13,26 @@ public class WeatherClient {
   private final Forecaster forecaster;
   private Forecast forecast;
 
-  static HashMap<String, Forecast> cache;
+  static LinkedHashMap<String, Forecast> cache;
 
   public boolean cachedData = false;
 
   WeatherClient () {
 
     this.forecaster = new Forecaster();
-    this.cache = new HashMap<String, Forecast>();
+    this.cache = new LinkedHashMap<String, Forecast>();
 
+  }
+
+  WeatherClient (int maxSize) {
+
+    this.forecaster = new Forecaster();
+    this.cache = new LinkedHashMap<String, Forecast>(){
+      protected boolean removeEldestEntry(Map.Entry<String, Forecast> eldest)
+      {
+        return size() > maxSize;
+      }
+    };
   }
 
   public Forecast check(String location, String date) {
@@ -36,9 +48,7 @@ public class WeatherClient {
     } else {
 
       this.forecast = forecaster.forecastFor(Region.valueOf(this.location), Day.valueOf(this.date));
-
       cache.put((this.location + this.date), this.forecast);
-
       this.cachedData = false;
     }
     return forecast;
