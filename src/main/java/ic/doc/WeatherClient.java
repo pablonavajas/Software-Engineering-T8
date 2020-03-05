@@ -1,11 +1,12 @@
 package ic.doc;
 
-import com.weather.*;
+import com.weather.Day;
+import com.weather.Forecast;
+import com.weather.Forecaster;
+import com.weather.Region;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 public class WeatherClient {
 
