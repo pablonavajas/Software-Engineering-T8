@@ -4,6 +4,8 @@ import com.weather.*;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class WeatherClient {
 
@@ -17,19 +19,18 @@ public class WeatherClient {
 
   public boolean cachedData = false;
 
-  WeatherClient () {
+  WeatherClient() {
 
     this.forecaster = new Forecaster();
     this.cache = new LinkedHashMap<String, Forecast>();
 
   }
 
-  WeatherClient (int maxSize) {
+  WeatherClient(int maxSize) {
 
     this.forecaster = new Forecaster();
-    this.cache = new LinkedHashMap<String, Forecast>(){
-      protected boolean removeEldestEntry(Map.Entry<String, Forecast> eldest)
-      {
+    this.cache = new LinkedHashMap<String, Forecast>() {
+      protected boolean removeEldestEntry(Map.Entry<String, Forecast> eldest) {
         return size() > maxSize;
       }
     };
@@ -49,6 +50,8 @@ public class WeatherClient {
 
       this.forecast = forecaster.forecastFor(Region.valueOf(this.location), Day.valueOf(this.date));
       cache.put((this.location + this.date), this.forecast);
+
+
       this.cachedData = false;
     }
     return forecast;
