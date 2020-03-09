@@ -1,12 +1,19 @@
 package ic.doc;
 
+import org.jmock.integration.junit4.JUnitRuleMockery;
+import org.junit.Rule;
 import org.junit.Test;
+
+import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 public class WeatherClientTest {
+
+  @Rule
+  public JUnitRuleMockery context = new JUnitRuleMockery();
 
   @Test
   public void weatherClientReturnsSummaryStringAndTempInt() {
@@ -57,5 +64,27 @@ public class WeatherClientTest {
 
     weatherClient.check("BIRMINGHAM", "TUESDAY");
     assertThat(weatherClient.dataCached(), is(false));
+  }
+
+  @Test
+  public void cachedDataDisappearsAfterOneMinute() {
+
+    WeatherClient weatherClient = new WeatherClient(1);
+
+    weatherClient.check("BIRMINGHAM", "TUESDAY");
+    assertThat(weatherClient.dataCached(), is(false));
+
+    weatherClient.check("BIRMINGHAM", "TUESDAY");
+    assertThat(weatherClient.dataCached(), is(true));
+
+    try {
+      TimeUnit.MINUTES.sleep(1);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+
+    weatherClient.check("BIRMINGHAM", "TUESDAY");
+    assertThat(weatherClient.dataCached(), is(false));
+
   }
 }

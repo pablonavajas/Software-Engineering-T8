@@ -5,10 +5,12 @@ import com.weather.Forecast;
 import com.weather.Forecaster;
 import com.weather.Region;
 
-import ic.doc.WeatherForecast;
+//import ic.doc.WeatherForecast;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import static java.lang.System.currentTimeMillis;
 
 public class WeatherClient {
 
@@ -23,7 +25,7 @@ public class WeatherClient {
 
   public boolean cachedData = false;
 
-  private final double maxTime = 3600000;
+  private final double maxTime = 60000;
 
   WeatherClient() {
 
@@ -52,16 +54,28 @@ public class WeatherClient {
       this.weatherForecast = cache.get(this.location + this.date);
       this.cachedData = true;
 
+      double timeNow = currentTimeMillis();
+
+      if (timeNow - weatherForecast.getTimeStamp() > maxTime) {
+        cache.remove(this.location + this.date);
+
+        useForecaster(this.location, this.date);
+      }
+
     } else {
 
-      this.forecast = forecaster.forecastFor(Region.valueOf(this.location), Day.valueOf(this.date));
-      this.weatherForecast = new WeatherForecast(forecast.temperature(), forecast.summary());
-      cache.put((this.location + this.date), this.weatherForecast);
-
-
-      this.cachedData = false;
+      useForecaster(this.location, this.date);
     }
     return forecast;
+  }
+
+  private void useForecaster(String location, String date){
+
+    this.forecast = forecaster.forecastFor(Region.valueOf(location), Day.valueOf(date));
+    this.weatherForecast = new WeatherForecast(forecast.temperature(), forecast.summary());
+    cache.put((this.location + this.date), this.weatherForecast);
+
+    this.cachedData = false;
   }
 
   public String summary() {

@@ -1,5 +1,7 @@
 package ic.doc;
 
+import static java.lang.System.currentTimeMillis;
+
 public class WeatherForecast {
 
   private int temp;
@@ -9,6 +11,7 @@ public class WeatherForecast {
   public WeatherForecast(int temp, String description) {
     this.temp = temp;
     this.description = description;
+    this.timeStamp = currentTimeMillis();
   }
 
   public int getTemp() {
@@ -21,10 +24,6 @@ public class WeatherForecast {
 
   public double getTimeStamp() {
     return timeStamp;
-  }
-
-  public void setTimeStamp(double time) {
-    this.timeStamp = time;
   }
 }
 
