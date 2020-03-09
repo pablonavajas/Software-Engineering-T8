@@ -5,6 +5,8 @@ import com.weather.Forecast;
 import com.weather.Forecaster;
 import com.weather.Region;
 
+import ic.doc.WeatherForecast;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -15,23 +17,26 @@ public class WeatherClient {
 
   private final Forecaster forecaster;
   private Forecast forecast;
+  private WeatherForecast weatherForecast;
 
-  static LinkedHashMap<String, Forecast> cache;
+  static LinkedHashMap<String, WeatherForecast> cache;
 
   public boolean cachedData = false;
+
+  private final double maxTime = 3600000;
 
   WeatherClient() {
 
     this.forecaster = new Forecaster();
-    this.cache = new LinkedHashMap<String, Forecast>();
+    this.cache = new LinkedHashMap<String, WeatherForecast>();
 
   }
 
   WeatherClient(int maxSize) {
 
     this.forecaster = new Forecaster();
-    this.cache = new LinkedHashMap<String, Forecast>() {
-      protected boolean removeEldestEntry(Map.Entry<String, Forecast> eldest) {
+    this.cache = new LinkedHashMap<String, WeatherForecast>() {
+      protected boolean removeEldestEntry(Map.Entry<String, WeatherForecast> eldest) {
         return size() > maxSize;
       }
     };
@@ -44,13 +49,14 @@ public class WeatherClient {
 
     if (cache.containsKey(this.location + this.date)) {
 
-      this.forecast = cache.get(this.location + this.date);
+      this.weatherForecast = cache.get(this.location + this.date);
       this.cachedData = true;
 
     } else {
 
       this.forecast = forecaster.forecastFor(Region.valueOf(this.location), Day.valueOf(this.date));
-      cache.put((this.location + this.date), this.forecast);
+      this.weatherForecast = new WeatherForecast(forecast.temperature(), forecast.summary());
+      cache.put((this.location + this.date), this.weatherForecast);
 
 
       this.cachedData = false;
@@ -59,11 +65,11 @@ public class WeatherClient {
   }
 
   public String summary() {
-    return forecast.summary();
+    return weatherForecast.getDescription();
   }
 
   public int temperature() {
-    return forecast.temperature();
+    return weatherForecast.getTemp();
   }
 
   public boolean dataCached() {
